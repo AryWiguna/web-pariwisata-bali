@@ -1092,7 +1092,7 @@
             
             // Camera
             camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-            camera.position.z = 3;
+            camera.position.z = 2.2; // Zoom closer to Bali
             
             // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1120,6 +1120,11 @@
             });
             
             globe = new THREE.Mesh(geometry, material);
+            
+            // Set initial rotation to focus on Bali
+            globe.rotation.x = -8.4 * (Math.PI / 180);
+            globe.rotation.y = (115.2 - 90) * (Math.PI / 180);
+
             scene.add(globe);
             
             // Add destination pins
@@ -1203,6 +1208,7 @@
             });
             const glow = new THREE.Mesh(glowGeometry, glowMaterial);
             glow.position.copy(position);
+            glow.userData = destination;
             globe.add(glow);
         }
 

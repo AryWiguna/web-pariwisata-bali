@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BaliSphere - Interactive Tourism Experience</title>
+    <meta name="description" content="Explore Bali like never before with our interactive 3D globe. Discover hidden gems, plan your journey, and experience paradise.">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #FAFAFA;
+            --bg-secondary: #FFFFFF;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --accent-blue: #1E88E5;
+            --accent-teal: #00BFA5;
+            --accent-yellow: #FFD54F;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        body.dark-mode {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --text-primary: #FAFAFA;
+            --text-secondary: #B0B0B0;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow: rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(30, 30, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Nunito', 'Open Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent-blue);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            transition: transform 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px var(--shadow);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            transition: 0.3s;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Globe Section */
+        .globe-section {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .globe-container {
+            position: relative;
+            height: 700px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        #globe {
+            width: 100%;
+            height: 100%;
+        }
+
+        .globe-title {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid var(--glass-border);
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        /* Destination Popup */
+        .destination-popup {
+            position: fixed;
+            top: 50%;
+            right: -500px;
+            transform: translateY(-50%);
+            width: 450px;
+            max-height: 90vh;
+            background: var(--bg-secondary);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 60px var(--shadow);
+            z-index: 100;
+            overflow-y: auto;
+            transition: right 0.4s ease;
+        }
+
+        .destination-popup.active {
+            right: 2rem;
+        }
+
+        .popup-header {
+            position: relative;
+            height: 250px;
+            border-radius: 1.5rem 1.5rem 0 0;
+            overflow: hidden;
+        }
+
+        .popup-header img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .close-popup {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+
+        .close-popup:hover {
+            transform: scale(1.1);
+        }
+
+        .popup-content {
+            padding: 2rem;
+        }
+
+        .popup-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .star {
+            color: var(--accent-yellow);
+        }
+
+        .description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .activities, .hotels {
+            margin-bottom: 2rem;
+        }
+
+        .activities h3, .hotels h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .hotel-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .hotel-item {
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hotel-name {
+            font-weight: 600;
+        }
+
+        .hotel-price {
+            color: var(--accent-teal);
+            font-weight: 700;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 6rem auto 2rem;
+            min-height: 70vh;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Destinations Grid */
+        .destinations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .destination-card {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .destination-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .destination-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-category {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Trip Planner */
+        .trip-planner {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .add-trip-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .add-trip-form input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .trip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .trip-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        .trip-item.completed {
+            opacity: 0.5;
+        }
+
+        .trip-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .trip-item span {
+            flex: 1;
+        }
+
+        .trip-item.completed span {
+            text-decoration: line-through;
+        }
+
+        .delete-btn {
+            background: #ff5252;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Hotels Section */
+        .hotels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .hotel-card {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow);
+            transition: transform 0.3s;
+        }
+
+        .hotel-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .hotel-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .hotel-card-content {
+            padding: 1.5rem;
+        }
+
+        .hotel-card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hotel-location {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .hotel-features {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .feature-badge {
+            padding: 0.25rem 0.75rem;
+            background: var(--accent-teal);
+            color: white;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .hotel-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .hotel-price-tag {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 900px;
+            margin: 3rem auto;
+            line-height: 1.8;
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 4rem;
+            padding: 3rem 2rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        /* Chatbot */
+        .chatbot-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px var(--shadow);
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 100px;
+            right: 2rem;
+            width: 350px;
+            height: 500px;
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px var(--shadow);
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+        }
+
+        .chatbot-window.active {
+            display: flex;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem 1rem 0 0;
+            font-weight: 600;
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+        }
+
+        .message.bot {
+            background: var(--accent-blue);
+            color: white;
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background: var(--bg-primary);
+            align-self: flex-end;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .chatbot-input button {
+            margin-left: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 80px;
+                left: -100%;
+                width: 100%;
+                flex-direction: column;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                transition: left 0.3s;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .globe-container {
+                height: 500px;
+            }
+
+            .destination-popup {
+                width: 90%;
+                right: -100%;
+            }
+
+            .destination-popup.active {
+                right: 5%;
+            }
+
+            .destinations-grid,
+            .hotels-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chatbot-window {
+                width: 90%;
+                right: 5%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="showSection('home')">
+                🌍 BaliSphere
+            </a>
+            <ul class="nav-menu" id="navMenu">
+                <li><a onclick="showSection('home')">Home</a></li>
+                <li><a onclick="showSection('destinations')">Destinations</a></li>
+                <li><a onclick="showSection('mytrip')">My Trip</a></li>
+                <li><a onclick="showSection('hotels')">Hotels</a></li>
+                <li><a onclick="showSection('about')">About</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button class="btn btn-primary">Sign In</button>
+                <div class="hamburger" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <div id="home" class="content-section active">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Explore Bali<br>Like Never Before</h1>
+            <p>Discover hidden gems, plan your journey, and experience paradise through our interactive globe</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="document.querySelector('.globe-section').scrollIntoView({behavior: 'smooth'})">
+                    📍 Start Exploring
+                </button>
+                <button class="btn btn-primary" onclick="showSection('mytrip')">
+                    ✓ Plan My Trip
+                </button>
+            </div>
+        </section>
+
+        <!-- Globe Section -->
+        <section class="globe-section">
+            <div class="globe-container">
+                <div class="globe-title">Interactive Tourism Experience</div>
+                <div id="globe"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Destinations Section -->
+    <div id="destinations" class="content-section">
+        <h2 class="section-title">Discover Bali Destinations</h2>
+        <div class="destinations-grid" id="destinationsGrid"></div>
+    </div>
+
+    <!-- My Trip Section -->
+    <div id="mytrip" class="content-section">
+        <h2 class="section-title">My Bali Itinerary</h2>
+        <div class="trip-planner">
+            <div class="add-trip-form">
+                <input type="text" id="tripInput" placeholder="Add activity (e.g., Visit Uluwatu Temple)">
+                <button class="btn btn-primary" onclick="addTripItem()">Add</button>
+            </div>
+            <div class="trip-list" id="tripList"></div>
+        </div>
+    </div>
+
+    <!-- Hotels Section -->
+    <div id="hotels" class="content-section">
+        <h2 class="section-title">Hotels & Accommodations</h2>
+        <div class="hotels-grid" id="hotelsGrid"></div>
+    </div>
+
+    <!-- About Section -->
+    <div id="about" class="content-section">
+        <h2 class="section-title">About BaliSphere</h2>
+        <div class="about-content">
+            <p>BaliSphere is your ultimate companion for exploring the beautiful island of Bali. We combine cutting-edge 3D visualization technology with comprehensive travel information to help you plan the perfect vacation.</p>
+            <p>Our interactive globe allows you to explore Bali's top destinations in an immersive way. Click on any location pin to discover detailed information, nearby hotels, and popular activities.</p>
+            <p>Whether you're looking for pristine beaches, ancient temples, lush rice terraces, or vibrant cultural experiences, BaliSphere makes it easy to discover and plan your dream Bali adventure.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Interactive Globe</h3>
+                <p>Explore destinations in 3D with our beautiful interactive globe</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>Curated Locations</h3>
+                <p>Discover hand-picked destinations across Bali</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">✓</div>
+                <h3>Trip Planning</h3>
+                <p>Create and manage your personalized itinerary</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏨</div>
+                <h3>Hotel Recommendations</h3>
+                <p>Find the perfect accommodation for your stay</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Made with ❤️ in Bali</p>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary);">© 2025 BaliSphere. All rights reserved.</p>
+    </footer>
+
+    <!-- Destination Popup -->
+    <div class="destination-popup" id="destinationPopup">
+        <div class="popup-header">
+            <img id="popupImage" src="" alt="">
+            <button class="close-popup" onclick="closePopup()">✕</button>
+        </div>
+        <div class="popup-content">
+            <h2 id="popupTitle"></h2>
+            <div class="rating" id="popupRating"></div>
+            <p class="description" id="popupDescription"></p>
+            
+            <div class="activities">
+                <h3>Popular Activities</h3>
+                <div class="activity-grid" id="popupActivities"></div>
+            </div>
+
+            <div class="hotels">
+                <h3>Nearby Hotels</h3>
+                <div class="hotel-list" id="popupHotels"></div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%" onclick="addToTrip()">
+                Add to My Trip
+            </button>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <button class="chatbot-button" onclick="toggleChatbot()">💬</button>
+    <div class="chatbot-window" id="chatbotWindow">
+        <div class="chatbot-header">
+            BaliSphere Assistant 🤖
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="message bot">Hi there! 👋 Need help planning your Bali trip?</div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Ask me about beaches or hotels...">
+            <button onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // Bali Destinations Data
+        const destinations = [
+            {
+                id: 1,
+                name: "Uluwatu Temple",
+                lat: -8.829,
+                lng: 115.085,
+                category: "Culture",
+                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
+                description: "Perched on a cliff 70 meters above sea level, Uluwatu Temple offers breathtaking ocean views and traditional Kecak dance performances at sunset.",
+                rating: 5,
+                activities: ["Kecak Dance", "Sunset Views", "Temple Tour", "Photography"],
+                hotels: [
+                    { name: "The Edge Bali", price: "$450/night", rating: 5 },
+                    { name: "Uluwatu Surf Villas", price: "$180/night", rating: 4 },
+                    { name: "Renaissance Bali", price: "$220/night", rating: 5 }
+                ]
+            },
+            {
+                id: 2,
+                name: "Seminyak Beach",
+                lat: -8.692,
+                lng: 115.166,
+                category: "Beach",
+                image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800",
+                description: "Famous for its golden sand, world-class restaurants, and vibrant nightlife. Perfect for surfing and watching stunning sunsets.",
+                rating: 5,
+                activities: ["Surfing", "Beach Clubs", "Shopping", "Dining"],
+                hotels: [
+                    { name: "The Legian Bali", price: "$380/night", rating: 5 },
+                    { name: "W Bali Seminyak", price: "$320/night", rating: 5 },
+                    { name: "Alila Seminyak", price: "$280/night", rating: 4 }
+                ]
+            },
+            {
+                id: 3,
+                name: "Tegalalang Rice Terrace",
+                lat: -8.434,
+                lng: 115.277,
+                category: "Nature",
+                image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800",
+                description: "Stunning terraced rice fields showcasing traditional Balinese irrigation system. A photographer's paradise with lush green landscapes.",
+                rating: 5,
+                activities: ["Photography", "Rice Terrace Walk", "Swing", "Cafe Visits"],
+                hotels: [
+                    { name: "Komaneka at Bisma", price: "$190/night", rating: 5 },
+                    { name: "Kamandalu Ubud", price: "$250/night", rating: 5 },
+                    { name: "Puri Sebali Resort", price: "$120/night", rating: 4 }
+                ]
+            },
+            {
+                id: 4,
+                name: "Tanah Lot",
+                lat: -8.621,
+                lng: 115.087,
+                category: "Culture",
+                image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800",
+                description: "Iconic sea temple on a rock formation, one of Bali's most photographed landmarks. Spectacular sunset views and spiritual atmosphere.",
+                rating: 5,
+                activities: ["Temple Visit", "Sunset Photography", "Cultural Shows", "Shopping"],
+                hotels: [
+                    { name: "Pan Pacific Nirwana", price: "$180/night", rating: 4 },
+                    { name: "Tanah Lot Resort", price: "$90/night", rating: 3 },
+                    { name: "WakaGangga Resort", price: "$150/night", rating: 4 }
+                ]
+            },
+            {
+                id: 5,
+                name: "Mount Batur",
+                lat: -8.242,
+                lng: 115.375,
+                category: "Nature",
+                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
+                description: "Active volcano offering sunrise trekking experiences with panoramic views of the caldera lake. An unforgettable adventure for nature lovers.",
+                rating: 5,
+                activities: ["Sunrise Trek", "Hot Springs", "Volcano Tour", "Photography"],
+                hotels: [
+                    { name: "Kintamani Eco Lodge", price: "$80/night", rating: 4 },
+                    { name: "Batur View Lodge", price: "$60/night", rating: 3 },
+                    { name: "Amagun Batur", price: "$95/night", rating: 4 }
+                ]
+            }
+        ];
+
+        // Hotels Data
+        const hotels = [
+            {
+                name: "The Mulia Bali",
+                location: "Nusa Dua",
+                price: "$420",
+                rating: 5,
+                image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800",
+                features: ["Beach Front", "Spa", "Pool", "Restaurant"]
+            },
+            {
+                name: "Four Seasons Sayan",
+                location: "Ubud",
+                price: "$650",
+                rating: 5,
+                image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800",
+                features: ["Jungle View", "Infinity Pool", "Yoga", "Fine Dining"]
+            },
+            {
+                name: "Potato Head Beach Club",
+                location: "Seminyak",
+                price: "$280",
+                rating: 4,
+                image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800",
+                features: ["Beach Club", "Restaurant", "Bar", "Pool"]
+            },
+            {
+                name: "Capella Ubud",
+                location: "Ubud",
+                price: "$890",
+                rating: 5,
+                image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800",
+                features: ["Luxury Tents", "Private Pool", "Jungle", "Spa"]
+            },
+            {
+                name: "Bulgari Resort Bali",
+                location: "Uluwatu",
+                price: "$720",
+                rating: 5,
+                image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800",
+                features: ["Cliff Top", "Spa", "Beach Access", "Fine Dining"]
+            },
+            {
+                name: "The Samaya Seminyak",
+                location: "Seminyak",
+                price: "$350",
+                rating: 5,
+                image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800",
+                features: ["Beachfront", "Private Villa", "Pool", "Restaurant"]
+            }
+        ];
+
+        // Global variables
+        let scene, camera, renderer, globe, controls;
+        let selectedDestination = null;
+        let tripItems = JSON.parse(localStorage.getItem('tripItems')) || [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initGlobe();
+            loadDestinationsGrid();
+            loadHotelsGrid();
+            loadTripItems();
+        });
+
+        // Three.js Globe
+        function initGlobe() {
+            const container = document.getElementById('globe');
+            
+            // Scene
+            scene = new THREE.Scene();
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+            camera.position.z = 3;
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            renderer.setClearColor(0x000000, 0);
+            container.appendChild(renderer.domElement);
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 3, 5);
+            scene.add(directionalLight);
+            
+            // Earth Globe with Texture
+            const textureLoader = new THREE.TextureLoader();
+            const earthTexture = textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg');
+            
+            const geometry = new THREE.SphereGeometry(1, 64, 64);
+            const material = new THREE.MeshPhongMaterial({
+                map: earthTexture,
+                bumpScale: 0.05,
+                specular: new THREE.Color('grey')
+            });
+            
+            globe = new THREE.Mesh(geometry, material);
+            scene.add(globe);
+            
+            // Add destination pins
+            destinations.forEach(dest => {
+                addPin(dest);
+            });
+            
+            // Mouse controls
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            
+            container.addEventListener('mousedown', () => isDragging = true);
+            container.addEventListener('mouseup', () => isDragging = false);
+            container.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - previousMousePosition.x;
+                    const deltaY = e.clientY - previousMousePosition.y;
+                    
+                    globe.rotation.y += deltaX * 0.005;
+                    globe.rotation.x += deltaY * 0.005;
+                }
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+            
+            // Zoom
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                camera.position.z += e.deltaY * 0.005;
+                camera.position.z = Math.max(2, Math.min(5, camera.position.z));
+            });
+            
+            // Animation
+            animate();
+            
+            // Responsive
+            window.addEventListener('resize', () => {
+                camera.aspect = container.offsetWidth / container.offsetHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.offsetWidth, container.offsetHeight);
+            });
+        }
+
+        function latLngToVector3(lat, lng, radius) {
+            const phi = (90 - lat) * (Math.PI / 180);
+            const theta = (lng + 180) * (Math.PI / 180);
+            
+            const x = -(radius * Math.sin(phi) * Math.cos(theta));
+            const y = radius * Math.cos(phi);
+            const z = radius * Math.sin(phi) * Math.sin(theta);
+            
+            return new THREE.Vector3(x, y, z);
+        }
+
+        function addPin(destination) {
+            const position = latLngToVector3(destination.lat, destination.lng, 1.02);
+            
+            // Pin marker
+            const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
+            const pinMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffd700,
+                emissive: 0xffd700,
+                emissiveIntensity: 0.5
+            });
+            const pin = new THREE.Mesh(pinGeometry, pinMaterial);
+            pin.position.copy(position);
+            pin.userData = destination;
+            
+            // Make pin clickable
+            pin.callback = function() {
+                showDestinationPopup(destination);
+            };
+            
+            globe.add(pin);
+            
+            // Add glow effect
+            const glowGeometry = new THREE.SphereGeometry(0.03, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.3
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.copy(position);
+            globe.add(glow);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Slow auto-rotation
+            if (!document.querySelector('#globe:hover')) {
+                globe.rotation.y += 0.001;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // Raycaster for click detection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        document.getElementById('globe').addEventListener('click', (event) => {
+            const container = document.getElementById('globe');
+            const rect = container.getBoundingClientRect();
+            
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(globe.children, true);
+            
+            if (intersects.length > 0) {
+                const object = intersects[0].object;
+                if (object.userData && object.userData.id) {
+                    showDestinationPopup(object.userData);
+                }
+            }
+        });
+
+        // Destination Popup
+        function showDestinationPopup(destination) {
+            selectedDestination = destination;
+            const popup = document.getElementById('destinationPopup');
+            
+            document.getElementById('popupImage').src = destination.image;
+            document.getElementById('popupTitle').textContent = destination.name;
+            document.getElementById('popupDescription').textContent = destination.description;
+            
+            // Rating
+            const ratingHTML = '★'.repeat(destination.rating);
+            document.getElementById('popupRating').innerHTML = ratingHTML.split('').map(star => 
+                `<span class="star">${star}</span>`
+            ).join('');
+            
+            // Activities
+            const activitiesHTML = destination.activities.map(activity => 
+                `<div class="activity-item">✨ ${activity}</div>`
+            ).join('');
+            document.getElementById('popupActivities').innerHTML = activitiesHTML;
+            
+            // Hotels
+            const hotelsHTML = destination.hotels.map(hotel => `
+                <div class="hotel-item">
+                    <div>
+                        <div class="hotel-name">${hotel.name}</div>
+                        <div class="rating">${'★'.repeat(hotel.rating)}</div>
+                    </div>
+                    <div class="hotel-price">${hotel.price}</div>
+                </div>
+            `).join('');
+            document.getElementById('popupHotels').innerHTML = hotelsHTML;
+            
+            popup.classList.add('active');
+        }
+
+        function closePopup() {
+            document.getElementById('destinationPopup').classList.remove('active');
+        }
+
+        // Destinations Grid
+        function loadDestinationsGrid() {
+            const grid = document.getElementById('destinationsGrid');
+            grid.innerHTML = destinations.map(dest => `
+                <div class="destination-card" onclick="showDestinationPopup(destinations[${dest.id - 1}])">
+                    <img src="${dest.image}" alt="${dest.name}">
+                    <div class="card-content">
+                        <h3>${dest.name}</h3>
+                        <span class="card-category">${dest.category}</span>
+                        <p style="color: var(--text-secondary)">${dest.description.substring(0, 100)}...</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Hotels Grid
+        function loadHotelsGrid() {
+            const grid = document.getElementById('hotelsGrid');
+            grid.innerHTML = hotels.map(hotel => `
+                <div class="hotel-card">
+                    <img src="${hotel.image}" alt="${hotel.name}">
+                    <div class="hotel-card-content">
+                        <h3>${hotel.name}</h3>
+                        <p class="hotel-location">📍 ${hotel.location}</p>
+                        <div class="rating">${'★'.repeat(hotel.rating)}</div>
+                        <div class="hotel-features">
+                            ${hotel.features.map(feature => `<span class="feature-badge">${feature}</span>`).join('')}
+                        </div>
+                        <div class="hotel-footer">
+                            <div class="hotel-price-tag">${hotel.price}/night</div>
+                            <button class="btn btn-primary">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Trip Planner
+        function addTripItem() {
+            const input = document.getElementById('tripInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const item = {
+                    id: Date.now(),
+                    text: text,
+                    completed: false
+                };
+                tripItems.push(item);
+                saveTripItems();
+                loadTripItems();
+                input.value = '';
+            }
+        }
+
+        function addToTrip() {
+            if (selectedDestination) {
+                const text = `Visit ${selectedDestination.name}`;
+                const exists = tripItems.find(item => item.text === text);
+                
+                if (!exists) {
+                    const item = {
+                        id: Date.now(),
+                        text: text,
+                        completed: false
+                    };
+                    tripItems.push(item);
+                    saveTripItems();
+                    loadTripItems();
+                    alert(`${selectedDestination.name} added to your trip!`);
+                } else {
+                    alert('Already in your trip planner!');
+                }
+            }
+        }
+
+        function toggleTripItem(id) {
+            const item = tripItems.find(i => i.id === id);
+            if (item) {
+                item.completed = !item.completed;
+                saveTripItems();
+                loadTripItems();
+            }
+        }
+
+        function deleteTripItem(id) {
+            tripItems = tripItems.filter(i => i.id !== id);
+            saveTripItems();
+            loadTripItems();
+        }
+
+        function loadTripItems() {
+            const list = document.getElementById('tripList');
+            
+            if (tripItems.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No items yet. Start planning your trip!</p>';
+                return;
+            }
+            
+            list.innerHTML = tripItems.map(item => `
+                <div class="trip-item ${item.completed ? 'completed' : ''}">
+                    <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleTripItem(${item.id})">
+                    <span>${item.text}</span>
+                    <button class="delete-btn" onclick="deleteTripItem(${item.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function saveTripItems() {
+            localStorage.setItem('tripItems', JSON.stringify(tripItems));
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Close mobile menu
+            document.getElementById('navMenu').classList.remove('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMenu() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
+
+        // Theme Toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeIcon');
+            icon.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeIcon').textContent = '☀️';
+        }
+
+        // Chatbot
+        function toggleChatbot() {
+            document.getElementById('chatbotWindow').classList.toggle('active');
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const messagesContainer = document.getElementById('chatMessages');
+                
+                // User message
+                messagesContainer.innerHTML += `<div class="message user">${text}</div>`;
+                
+                // Bot response (simple logic)
+                setTimeout(() => {
+                    let response = "I can help you with information about Bali destinations, hotels, and activities!";
+                    
+                    if (text.toLowerCase().includes('beach')) {
+                        response = "🏖️ Bali has amazing beaches! Check out Seminyak Beach for surfing and beach clubs, or Nusa Dua for calmer waters.";
+                    } else if (text.toLowerCase().includes('hotel')) {
+                        response = "🏨 We have many great hotels! The Mulia in Nusa Dua and Four Seasons Sayan in Ubud are highly recommended.";
+                    } else if (text.toLowerCase().includes('temple')) {
+                        response = "🛕 Don't miss Uluwatu Temple and Tanah Lot! Both offer stunning views and cultural experiences.";
+                    } else if (text.toLowerCase().includes('rice')) {
+                        response = "🌾 Tegalalang Rice Terrace is breathtaking! Perfect for photography and experiencing traditional Balinese agriculture.";
+                    }
+                    
+                    messagesContainer.innerHTML += `<div class="message bot">${response}</div>`;
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, 500);
+                
+                input.value = '';
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        // Allow Enter key for chat
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+
+        // Allow Enter key for trip input
+        document.getElementById('tripInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTripItem();
+            }
+        });
+    </script>
+</body>
+</html>

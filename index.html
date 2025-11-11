@@ -771,6 +771,84 @@
                 font-size: 2rem;
             }
         }
+
+    /* Auth Modal */
+    .auth-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .auth-modal.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .auth-modal-content {
+        background: var(--bg-secondary);
+        padding: 3rem;
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 400px;
+        position: relative;
+        text-align: center;
+    }
+
+    .close-auth-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+
+    .auth-form-container h2 {
+        margin-bottom: 2rem;
+    }
+
+    .auth-form-container form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .auth-form-container input {
+        padding: 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .auth-form-container p {
+        margin-top: 2rem;
+    }
+
+    .auth-form-container a {
+        color: var(--accent-blue);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    @media (max-width: 480px) {
+        .auth-modal-content {
+            padding: 2rem;
+        }
+    }
     </style>
 </head>
 <body>
@@ -785,13 +863,15 @@
                 <li><a onclick="showSection('destinations')">Destinations</a></li>
                 <li><a onclick="showSection('mytrip')">My Trip</a></li>
                 <li><a onclick="showSection('hotels')">Hotels</a></li>
+                <li><a onclick="showSection('foods')">Foods</a></li>
+                <li><a onclick="showSection('traditions')">Traditions</a></li>
                 <li><a onclick="showSection('about')">About</a></li>
             </ul>
-            <div class="nav-actions">
+            <div class="nav-actions" id="navActions">
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span>
                 </button>
-                <button class="btn btn-primary">Sign In</button>
+                <button class="btn btn-primary" onclick="openAuthModal()">Sign In / Sign Up</button>
                 <div class="hamburger" onclick="toggleMenu()">
                     <span></span>
                     <span></span>
@@ -881,6 +961,19 @@
             </div>
         </div>
     </div>
+
+        <!-- Foods Section -->
+    <div id="foods" class="content-section">
+        <h2 class="section-title">Balinese Culinary Delights</h2>
+        <div class="destinations-grid" id="foodsGrid"></div>
+    </div>
+
+    <!-- Traditions Section -->
+    <div id="traditions" class="content-section">
+        <h2 class="section-title">Unique Balinese Traditions</h2>
+        <div class="destinations-grid" id="traditionsGrid"></div>
+    </div>
+
 
     <!-- Footer -->
     <footer>
@@ -1015,6 +1108,54 @@
                     { name: "Batur View Lodge", price: "$60/night", rating: 3 },
                     { name: "Amagun Batur", price: "$95/night", rating: 4 }
                 ]
+            },
+            {
+                id: 6,
+                name: "Kuta Beach",
+                lat: -8.718,
+                lng: 115.168,
+                category: "Beach",
+                image: "https://bungobaru.id/wp-content/uploads/2025/08/Kutas-Beach.jpg",
+                description: "Iconic beach known for its long sandy stretch, surf spots, and vibrant nightlife. A classic Bali destination for fun and sun.",
+                rating: 4,
+                activities: ["Surfing", "Sunbathing", "Shopping", "Nightlife"],
+                hotels: [
+                    { name: "Hard Rock Hotel Bali", price: "$250/night", rating: 5 },
+                    { name: "The Stones Hotel", price: "$180/night", rating: 4 },
+                    { name: "Sheraton Bali Kuta Resort", price: "$220/night", rating: 5 }
+                ]
+            },
+            {
+                id: 7,
+                name: "Nusa Penida",
+                lat: -8.752,
+                lng: 115.474,
+                category: "Nature",
+                image: "https://nusapenida.org/wp-content/uploads/2023/09/Kelingking-Beach-Nusa-Penida-Bali-drone-panorama.jpg",
+                description: "A rugged island paradise famous for its dramatic cliffs, pristine beaches like Kelingking Beach, and incredible snorkeling spots.",
+                rating: 5,
+                activities: ["Snorkeling", "Diving", "Hiking", "Beach Hopping"],
+                hotels: [
+                    { name: "The Mesare Resort", price: "$150/night", rating: 5 },
+                    { name: "Semabu Hills Hotel", price: "$120/night", rating: 4 },
+                    { name: "Daphila Cottage", price: "$90/night", rating: 4 }
+                ]
+            },
+            {
+                id: 8,
+                name: "Ubud Monkey Forest",
+                lat: -8.519,
+                lng: 115.260,
+                category: "Nature",
+                image: "https://media.cntraveler.com/photos/5c190d36a6a145617b7c73f3/16:9/w_2560%2Cc_limit/GettyImages-482510997.jpg",
+                description: "A sacred sanctuary home to over a thousand long-tailed macaques. Wander through the lush jungle and discover ancient temples.",
+                rating: 4,
+                activities: ["Wildlife Watching", "Temple Visit", "Nature Walk", "Photography"],
+                hotels: [
+                    { name: "Komaneka at Rasa Sayang", price: "$200/night", rating: 5 },
+                    { name: "Bisma Eight", price: "$280/night", rating: 5 },
+                    { name: "Alaya Resort Ubud", price: "$170/night", rating: 4 }
+                ]
             }
         ];
 
@@ -1070,6 +1211,44 @@
             }
         ];
 
+        // Bali Foods Data
+        const baliFoods = [
+            {
+                name: "Babi Guling",
+                image: "https://images.ctfassets.net/dsbipkqphva2/72JUsAlJ4IMn0Lsi7vpvEz/36de9180b101d808630599eadce4f40c/best-babi-guling-bali-lead.jpg",
+                description: "Suckling pig roasted over a fire with a blend of rich Balinese spices. A must-try celebratory dish.",
+            },
+            {
+                name: "Sate Lilit",
+                image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800",
+                description: "Minced meat satay lilit (wrapped) around lemongrass sticks, giving it a unique, aromatic flavor.",
+            },
+            {
+                name: "Bebek Betutu",
+                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
+                description: "Slow-cooked duck seasoned with a rich betutu spice mix, resulting in tender, flavorful meat.",
+            }
+        ];
+
+        // Bali Traditions Data
+        const baliTraditions = [
+            {
+                name: "Nyepi (Day of Silence)",
+                image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800",
+                description: "A unique Hindu celebration where the entire island shuts down for 24 hours of silence, meditation, and self-reflection.",
+            },
+            {
+                name: "Galungan & Kuningan",
+                image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800",
+                description: "A major festival celebrating the victory of good over evil. Streets are decorated with beautiful bamboo poles called 'penjor'.",
+            },
+            {
+                name: "Kecak Dance",
+                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
+                description: "A captivating dance performance telling the Ramayana story, performed by a chorus of over a hundred men chanting 'cak-cak'.",
+            }
+        ];
+
         // Global variables
         let scene, camera, renderer, globe, controls;
         let selectedDestination = null;
@@ -1080,8 +1259,38 @@
             initGlobe();
             loadDestinationsGrid();
             loadHotelsGrid();
+            loadFoodsGrid();
+            loadTraditionsGrid();
             loadTripItems();
         });
+
+        // Foods Grid
+        function loadFoodsGrid() {
+            const grid = document.getElementById('foodsGrid');
+            grid.innerHTML = baliFoods.map(food => `
+                <div class="destination-card">
+                    <img src="${food.image}" alt="${food.name}">
+                    <div class="card-content">
+                        <h3>${food.name}</h3>
+                        <p style="color: var(--text-secondary);">${food.description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Traditions Grid
+        function loadTraditionsGrid() {
+            const grid = document.getElementById('traditionsGrid');
+            grid.innerHTML = baliTraditions.map(tradition => `
+                <div class="destination-card">
+                    <img src="${tradition.image}" alt="${tradition.name}">
+                    <div class="card-content">
+                        <h3>${tradition.name}</h3>
+                        <p style="color: var(--text-secondary);">${tradition.description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
 
         // Three.js Globe
         function initGlobe() {
@@ -1092,7 +1301,7 @@
             
             // Camera
             camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-            camera.position.z = 2.2; // Zoom closer to Bali
+            camera.position.z = 1.5; // Zoom closer to Bali
             
             // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1480,6 +1689,112 @@
                 addTripItem();
             }
         });
+
+        // Auth Modal
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+        }
+
+        function toggleAuthForms() {
+            const loginContainer = document.getElementById('loginContainer');
+            const signupContainer = document.getElementById('signupContainer');
+            if (loginContainer.style.display === 'none') {
+                loginContainer.style.display = 'block';
+                signupContainer.style.display = 'none';
+            } else {
+                loginContainer.style.display = 'none';
+                signupContainer.style.display = 'block';
+            }
+        }
+
+        // User Auth
+        function handleSignup(event) {
+            event.preventDefault();
+            const form = event.target;
+            const user = {
+                name: form[0].value,
+                email: form[1].value,
+                password: form[2].value
+            };
+            localStorage.setItem('user', JSON.stringify(user));
+            alert('Sign up successful! Please sign in.');
+            toggleAuthForms();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const email = form[0].value;
+            const password = form[1].value;
+
+            const user = JSON.parse(localStorage.getItem('user'));
+
+            if (user && user.email === email && user.password === password) {
+                alert(`Welcome back, ${user.name}!`);
+                closeAuthModal();
+                updateNavForLoggedInUser(user);
+            } else {
+                alert('Invalid email or password.');
+            }
+        }
+
+        function updateNavForLoggedInUser(user) {
+            const navActions = document.getElementById('navActions');
+            navActions.innerHTML = `
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <span style="font-weight: 600;">Welcome, ${user.name}</span>
+                <button class="btn btn-primary" onclick="handleLogout()">Logout</button>
+                <div class="hamburger" onclick="toggleMenu()">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('user');
+            location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                updateNavForLoggedInUser(user);
+            }
+        });
     </script>
+
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <button class="close-auth-modal" onclick="closeAuthModal()">✕</button>
+            <div class="auth-form-container" id="loginContainer">
+                <h2>Sign In</h2>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                </form>
+                <p>Don't have an account? <a href="#" onclick="toggleAuthForms()">Sign Up</a></p>
+            </div>
+            <div class="auth-form-container" id="signupContainer" style="display: none;">
+                <h2>Create Account</h2>
+                <form id="signupForm" onsubmit="handleSignup(event)">
+                    <input type="text" placeholder="Full Name" required>
+                    <input type="email" placeholder="Email" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+                <p>Already have an account? <a href="#" onclick="toggleAuthForms()">Sign In</a></p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

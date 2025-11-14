@@ -919,6 +919,7 @@
             <div class="add-trip-form">
                 <input type="text" id="tripInput" placeholder="Add activity (e.g., Visit Uluwatu Temple)">
                 <button class="btn btn-primary" onclick="addTripItem()">Add</button>
+                <button class="btn btn-primary" onclick="generateItinerary()">Generate with AI</button>
             </div>
             <div class="trip-list" id="tripList"></div>
         </div>
@@ -962,24 +963,6 @@
         </div>
     </div>
 
-        <!-- Foods Section -->
-    <div id="foods" class="content-section">
-        <h2 class="section-title">Balinese Culinary Delights</h2>
-        <div class="destinations-grid" id="foodsGrid"></div>
-    </div>
-
-    <!-- Traditions Section -->
-    <div id="traditions" class="content-section">
-        <h2 class="section-title">Unique Balinese Traditions</h2>
-        <div class="destinations-grid" id="traditionsGrid"></div>
-    </div>
-
-
-    <!-- Footer -->
-    <footer>
-        <p>Made with ❤️ in Bali</p>
-        <p style="margin-top: 0.5rem; color: var(--text-secondary);">© 2025 BaliSphere. All rights reserved.</p>
-    </footer>
 
     <!-- Destination Popup -->
     <div class="destination-popup" id="destinationPopup">
@@ -1007,6 +990,25 @@
             </button>
         </div>
     </div>
+
+        <!-- Foods Section -->
+    <div id="foods" class="content-section">
+        <h2 class="section-title">Balinese Culinary Delights</h2>
+        <div class="destinations-grid" id="foodsGrid"></div>
+    </div>
+
+    <!-- Traditions Section -->
+    <div id="traditions" class="content-section">
+        <h2 class="section-title">Unique Balinese Traditions</h2>
+        <div class="destinations-grid" id="traditionsGrid"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Made with ❤️ in Bali</p>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary);">© 2025 BaliSphere. All rights reserved.</p>
+    </footer>
+
 
     <!-- Chatbot -->
     <button class="chatbot-button" onclick="toggleChatbot()">💬</button>
@@ -1131,7 +1133,7 @@
                 lat: -8.752,
                 lng: 115.474,
                 category: "Nature",
-                image: "https://nusapenida.org/wp-content/uploads/2023/09/Kelingking-Beach-Nusa-Penida-Bali-drone-panorama.jpg",
+                image: "https://bams.jambiprov.go.id/wp-content/uploads/2023/03/nusa-penida-1.png",
                 description: "A rugged island paradise famous for its dramatic cliffs, pristine beaches like Kelingking Beach, and incredible snorkeling spots.",
                 rating: 5,
                 activities: ["Snorkeling", "Diving", "Hiking", "Beach Hopping"],
@@ -1147,7 +1149,7 @@
                 lat: -8.519,
                 lng: 115.260,
                 category: "Nature",
-                image: "https://media.cntraveler.com/photos/5c190d36a6a145617b7c73f3/16:9/w_2560%2Cc_limit/GettyImages-482510997.jpg",
+                image: "https://monkeyforestubud.com/wp-content/uploads/2023/09/banner-3-lowpress.jpg?x57725",
                 description: "A sacred sanctuary home to over a thousand long-tailed macaques. Wander through the lush jungle and discover ancient temples.",
                 rating: 4,
                 activities: ["Wildlife Watching", "Temple Visit", "Nature Walk", "Photography"],
@@ -1220,12 +1222,12 @@
             },
             {
                 name: "Sate Lilit",
-                image: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=800",
+                image: "https://asset.kompas.com/crops/3-vl1tED7mbP67hKrA682fi-2Gc=/0x411:667x856/1200x800/data/photo/2022/06/07/629f11723dc16.jpg",
                 description: "Minced meat satay lilit (wrapped) around lemongrass sticks, giving it a unique, aromatic flavor.",
             },
             {
                 name: "Bebek Betutu",
-                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
+                image: "https://www.unileverfoodsolutions.co.id/dam/global-ufs/mcos/SEA/calcmenu/recipes/ID-recipes/chicken-&-other-poultry-dishes/bebek-betutu/main-header.jpg",
                 description: "Slow-cooked duck seasoned with a rich betutu spice mix, resulting in tender, flavorful meat.",
             }
         ];
@@ -1234,23 +1236,23 @@
         const baliTraditions = [
             {
                 name: "Nyepi (Day of Silence)",
-                image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZuVOXAw9ZVPGSVJSXT61HOCzym62sDL5UA&s",
                 description: "A unique Hindu celebration where the entire island shuts down for 24 hours of silence, meditation, and self-reflection.",
             },
             {
                 name: "Galungan & Kuningan",
-                image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRytTJJ6aNZ4jbjD0-AFk0mu7VRbvfo-O82Yg&s",
                 description: "A major festival celebrating the victory of good over evil. Streets are decorated with beautiful bamboo poles called 'penjor'.",
             },
             {
                 name: "Kecak Dance",
-                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
+                image: "https://img.jakpost.net/c/2017/05/04/2017_05_04_26341_1493864360._large.jpg",
                 description: "A captivating dance performance telling the Ramayana story, performed by a chorus of over a hundred men chanting 'cak-cak'.",
             }
         ];
 
         // Global variables
-        let scene, camera, renderer, globe, controls;
+        let scene, camera, renderer, globe, controls, clickablePins = [];
         let selectedDestination = null;
         let tripItems = JSON.parse(localStorage.getItem('tripItems')) || [];
 
@@ -1301,7 +1303,7 @@
             
             // Camera
             camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
-            camera.position.z = 1.5; // Zoom closer to Bali
+            camera.position.z = 2.5; // Adjusted for a better initial view
             
             // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -1402,9 +1404,7 @@
             pin.userData = destination;
             
             // Make pin clickable
-            pin.callback = function() {
-                showDestinationPopup(destination);
-            };
+            clickablePins.push(pin); // Add to clickable array
             
             globe.add(pin);
             
@@ -1417,7 +1417,7 @@
             });
             const glow = new THREE.Mesh(glowGeometry, glowMaterial);
             glow.position.copy(position);
-            glow.userData = destination;
+            // No userData needed for glow, it's just decorative
             globe.add(glow);
         }
 
@@ -1444,7 +1444,7 @@
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
             
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(globe.children, true);
+            const intersects = raycaster.intersectObjects(clickablePins, true);
             
             if (intersects.length > 0) {
                 const object = intersects[0].object;
@@ -1606,6 +1606,66 @@
             localStorage.setItem('tripItems', JSON.stringify(tripItems));
         }
 
+        async function generateItinerary() {
+            const prompt = "Generate a 3-day Bali itinerary for a first-time visitor. Focus on a mix of culture, nature, and relaxation. Please list at least 2 activities per day. For example: 'Day 1: Visit Uluwatu Temple, Watch Kecak Dance'.";
+
+            try {
+                const response = await fetch('http://localhost:11434/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-oss:20b',
+                        messages: [{ role: 'user', content: prompt }],
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullResponse = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    for (const line of lines) {
+                        if (line.trim()) {
+                            const parsed = JSON.parse(line);
+                            fullResponse += parsed.message.content;
+                        }
+                    }
+                }
+
+                // Process the AI response to create trip items
+                const activities = fullResponse.split('\n').filter(line => line.trim().length > 0 && isNaN(parseInt(line[0])));
+
+                activities.forEach(activity => {
+                    const cleanedActivity = activity.replace(/-\s*/, '').trim();
+                    if (cleanedActivity) {
+                        const item = {
+                            id: Date.now() + Math.random(),
+                            text: cleanedActivity,
+                            completed: false
+                        };
+                        tripItems.push(item);
+                    }
+                });
+
+                saveTripItems();
+                loadTripItems();
+
+            } catch (error) {
+                console.error('Error generating itinerary:', error);
+                alert("Sorry, I couldn't generate an itinerary right now. Please try again later.");
+            }
+        }
+
         // Navigation
         function showSection(sectionId) {
             document.querySelectorAll('.content-section').forEach(section => {
@@ -1643,7 +1703,7 @@
             document.getElementById('chatbotWindow').classList.toggle('active');
         }
 
-        function sendChatMessage() {
+        async function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             
@@ -1652,29 +1712,55 @@
                 
                 // User message
                 messagesContainer.innerHTML += `<div class="message user">${text}</div>`;
-                
-                // Bot response (simple logic)
-                setTimeout(() => {
-                    let response = "I can help you with information about Bali destinations, hotels, and activities!";
-                    
-                    if (text.toLowerCase().includes('beach')) {
-                        response = "🏖️ Bali has amazing beaches! Check out Seminyak Beach for surfing and beach clubs, or Nusa Dua for calmer waters.";
-                    } else if (text.toLowerCase().includes('hotel')) {
-                        response = "🏨 We have many great hotels! The Mulia in Nusa Dua and Four Seasons Sayan in Ubud are highly recommended.";
-                    } else if (text.toLowerCase().includes('temple')) {
-                        response = "🛕 Don't miss Uluwatu Temple and Tanah Lot! Both offer stunning views and cultural experiences.";
-                    } else if (text.toLowerCase().includes('rice')) {
-                        response = "🌾 Tegalalang Rice Terrace is breathtaking! Perfect for photography and experiencing traditional Balinese agriculture.";
-                    }
-                    
-                    messagesContainer.innerHTML += `<div class="message bot">${response}</div>`;
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }, 500);
-                
                 input.value = '';
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                // Bot response
+                try {
+                    const response = await fetch('http://localhost:11434/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-oss:20b',
+                            messages: [{ role: 'user', content: text }],
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let botMessage = '';
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) {
+                            break;
+                        }
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            if (line.trim()) {
+                                const parsed = JSON.parse(line);
+                                botMessage += parsed.message.content;
+                            }
+                        }
+                    }
+                    
+                    messagesContainer.innerHTML += `<div class="message bot">${botMessage}</div>`;
+                } catch (error) {
+                    console.error('Error fetching from Ollama:', error);
+                    messagesContainer.innerHTML += `<div class="message bot">Sorry, I'm having trouble connecting to the AI. Please try again later.</div>`;
+                } finally {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
             }
         }
+
 
         // Allow Enter key for chat
         document.getElementById('chatInput').addEventListener('keypress', (e) => {

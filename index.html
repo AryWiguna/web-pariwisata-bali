@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BaliSphere - Interactive Tourism Experience</title>
     <meta name="description" content="Explore Bali like never before with our interactive 3D globe. Discover hidden gems, plan your journey, and experience paradise.">
-    
+
     <style>
         * {
             margin: 0;
@@ -712,9 +712,10 @@
         @media (max-width: 768px) {
             .nav-menu {
                 position: fixed;
-                top: 80px;
+                top: 70px; /* Adjust to match navbar height */
                 left: -100%;
                 width: 100%;
+                height: 100vh;
                 flex-direction: column;
                 background: var(--glass-bg);
                 backdrop-filter: blur(20px);
@@ -729,7 +730,21 @@
             .hamburger {
                 display: flex;
             }
+        }
 
+        @media (min-width: 769px) {
+            .nav-menu {
+                display: flex !important;
+                position: static;
+                flex-direction: row;
+                background: transparent;
+                backdrop-filter: none;
+                padding: 0;
+                transition: none;
+            }
+        }
+
+        @media (max-width: 960px) {
             .hero h1 {
                 font-size: 2.5rem;
             }
@@ -871,12 +886,12 @@
                 <button class="theme-toggle" onclick="toggleTheme()">
                     <span id="themeIcon">🌙</span>
                 </button>
-                <button class="btn btn-primary" onclick="openAuthModal()">Sign In / Sign Up</button>
-                <div class="hamburger" onclick="toggleMenu()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <button class="btn btn-primary" onclick="openAuthModal('login')">Sign In / Sign Up</button>
+            </div>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
         </div>
     </nav>
@@ -974,7 +989,7 @@
             <h2 id="popupTitle"></h2>
             <div class="rating" id="popupRating"></div>
             <p class="description" id="popupDescription"></p>
-            
+
             <div class="activities">
                 <h3>Popular Activities</h3>
                 <div class="activity-grid" id="popupActivities"></div>
@@ -1264,12 +1279,13 @@
             loadFoodsGrid();
             loadTraditionsGrid();
             loadTripItems();
+            checkCurrentUser();
         });
 
         // Foods Grid
         function loadFoodsGrid() {
             const grid = document.getElementById('foodsGrid');
-            grid.innerHTML = baliFoods.map(food => `
+            grid.innerHTML = baliFoods.map((food, index) => `
                 <div class="destination-card">
                     <img src="${food.image}" alt="${food.name}">
                     <div class="card-content">
@@ -1283,7 +1299,7 @@
         // Traditions Grid
         function loadTraditionsGrid() {
             const grid = document.getElementById('traditionsGrid');
-            grid.innerHTML = baliTraditions.map(tradition => `
+            grid.innerHTML = baliTraditions.map((tradition, index) => `
                 <div class="destination-card">
                     <img src="${tradition.image}" alt="${tradition.name}">
                     <div class="card-content">
@@ -1297,79 +1313,79 @@
         // Three.js Globe
         function initGlobe() {
             const container = document.getElementById('globe');
-            
+
             // Scene
             scene = new THREE.Scene();
-            
+
             // Camera
             camera = new THREE.PerspectiveCamera(50, container.offsetWidth / container.offsetHeight, 0.1, 1000);
             camera.position.z = 2.5; // Adjusted for a better initial view
-            
+
             // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             renderer.setSize(container.offsetWidth, container.offsetHeight);
             renderer.setClearColor(0x000000, 0);
             container.appendChild(renderer.domElement);
-            
+
             // Lights
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
-            
+
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(5, 3, 5);
             scene.add(directionalLight);
-            
+
             // Earth Globe with Texture
             const textureLoader = new THREE.TextureLoader();
             const earthTexture = textureLoader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg');
-            
+
             const geometry = new THREE.SphereGeometry(1, 64, 64);
             const material = new THREE.MeshPhongMaterial({
                 map: earthTexture,
                 bumpScale: 0.05,
                 specular: new THREE.Color('grey')
             });
-            
+
             globe = new THREE.Mesh(geometry, material);
-            
+
             // Set initial rotation to focus on Bali
             globe.rotation.x = -8.4 * (Math.PI / 180);
             globe.rotation.y = (115.2 - 90) * (Math.PI / 180);
 
             scene.add(globe);
-            
+
             // Add destination pins
             destinations.forEach(dest => {
                 addPin(dest);
             });
-            
+
             // Mouse controls
             let isDragging = false;
             let previousMousePosition = { x: 0, y: 0 };
-            
+
             container.addEventListener('mousedown', () => isDragging = true);
             container.addEventListener('mouseup', () => isDragging = false);
             container.addEventListener('mousemove', (e) => {
                 if (isDragging) {
                     const deltaX = e.clientX - previousMousePosition.x;
                     const deltaY = e.clientY - previousMousePosition.y;
-                    
+
                     globe.rotation.y += deltaX * 0.005;
                     globe.rotation.x += deltaY * 0.005;
                 }
                 previousMousePosition = { x: e.clientX, y: e.clientY };
             });
-            
+
             // Zoom
             container.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 camera.position.z += e.deltaY * 0.005;
                 camera.position.z = Math.max(2, Math.min(5, camera.position.z));
             });
-            
+
             // Animation
             animate();
-            
+
             // Responsive
             window.addEventListener('resize', () => {
                 camera.aspect = container.offsetWidth / container.offsetHeight;
@@ -1381,20 +1397,20 @@
         function latLngToVector3(lat, lng, radius) {
             const phi = (90 - lat) * (Math.PI / 180);
             const theta = (lng + 180) * (Math.PI / 180);
-            
+
             const x = -(radius * Math.sin(phi) * Math.cos(theta));
             const y = radius * Math.cos(phi);
             const z = radius * Math.sin(phi) * Math.sin(theta);
-            
+
             return new THREE.Vector3(x, y, z);
         }
 
         function addPin(destination) {
             const position = latLngToVector3(destination.lat, destination.lng, 1.02);
-            
+
             // Pin marker
             const pinGeometry = new THREE.SphereGeometry(0.02, 16, 16);
-            const pinMaterial = new THREE.MeshBasicMaterial({ 
+            const pinMaterial = new THREE.MeshBasicMaterial({
                 color: 0xffd700,
                 emissive: 0xffd700,
                 emissiveIntensity: 0.5
@@ -1402,12 +1418,12 @@
             const pin = new THREE.Mesh(pinGeometry, pinMaterial);
             pin.position.copy(position);
             pin.userData = destination;
-            
+
             // Make pin clickable
             clickablePins.push(pin); // Add to clickable array
-            
+
             globe.add(pin);
-            
+
             // Add glow effect
             const glowGeometry = new THREE.SphereGeometry(0.03, 16, 16);
             const glowMaterial = new THREE.MeshBasicMaterial({
@@ -1423,12 +1439,12 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            
+
             // Slow auto-rotation
             if (!document.querySelector('#globe:hover')) {
                 globe.rotation.y += 0.001;
             }
-            
+
             renderer.render(scene, camera);
         }
 
@@ -1439,13 +1455,13 @@
         document.getElementById('globe').addEventListener('click', (event) => {
             const container = document.getElementById('globe');
             const rect = container.getBoundingClientRect();
-            
+
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-            
+
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(clickablePins, true);
-            
+
             if (intersects.length > 0) {
                 const object = intersects[0].object;
                 if (object.userData && object.userData.id) {
@@ -1458,23 +1474,23 @@
         function showDestinationPopup(destination) {
             selectedDestination = destination;
             const popup = document.getElementById('destinationPopup');
-            
+
             document.getElementById('popupImage').src = destination.image;
             document.getElementById('popupTitle').textContent = destination.name;
             document.getElementById('popupDescription').textContent = destination.description;
-            
+
             // Rating
             const ratingHTML = '★'.repeat(destination.rating);
-            document.getElementById('popupRating').innerHTML = ratingHTML.split('').map(star => 
+            document.getElementById('popupRating').innerHTML = ratingHTML.split('').map(star =>
                 `<span class="star">${star}</span>`
             ).join('');
-            
+
             // Activities
-            const activitiesHTML = destination.activities.map(activity => 
+            const activitiesHTML = destination.activities.map(activity =>
                 `<div class="activity-item">✨ ${activity}</div>`
             ).join('');
             document.getElementById('popupActivities').innerHTML = activitiesHTML;
-            
+
             // Hotels
             const hotelsHTML = destination.hotels.map(hotel => `
                 <div class="hotel-item">
@@ -1486,7 +1502,7 @@
                 </div>
             `).join('');
             document.getElementById('popupHotels').innerHTML = hotelsHTML;
-            
+
             popup.classList.add('active');
         }
 
@@ -1497,8 +1513,8 @@
         // Destinations Grid
         function loadDestinationsGrid() {
             const grid = document.getElementById('destinationsGrid');
-            grid.innerHTML = destinations.map(dest => `
-                <div class="destination-card" onclick="showDestinationPopup(destinations[${dest.id - 1}])">
+            grid.innerHTML = destinations.map((dest, index) => `
+                <div class="destination-card" onclick="showDestinationPopup(destinations[${index}])">
                     <img src="${dest.image}" alt="${dest.name}">
                     <div class="card-content">
                         <h3>${dest.name}</h3>
@@ -1512,7 +1528,7 @@
         // Hotels Grid
         function loadHotelsGrid() {
             const grid = document.getElementById('hotelsGrid');
-            grid.innerHTML = hotels.map(hotel => `
+            grid.innerHTML = hotels.map((hotel, index) => `
                 <div class="hotel-card">
                     <img src="${hotel.image}" alt="${hotel.name}">
                     <div class="hotel-card-content">
@@ -1535,7 +1551,7 @@
         function addTripItem() {
             const input = document.getElementById('tripInput');
             const text = input.value.trim();
-            
+
             if (text) {
                 const item = {
                     id: Date.now(),
@@ -1553,7 +1569,7 @@
             if (selectedDestination) {
                 const text = `Visit ${selectedDestination.name}`;
                 const exists = tripItems.find(item => item.text === text);
-                
+
                 if (!exists) {
                     const item = {
                         id: Date.now(),
@@ -1587,12 +1603,12 @@
 
         function loadTripItems() {
             const list = document.getElementById('tripList');
-            
+
             if (tripItems.length === 0) {
                 list.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No items yet. Start planning your trip!</p>';
                 return;
             }
-            
+
             list.innerHTML = tripItems.map(item => `
                 <div class="trip-item ${item.completed ? 'completed' : ''}">
                     <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleTripItem(${item.id})">
@@ -1672,10 +1688,10 @@
                 section.classList.remove('active');
             });
             document.getElementById(sectionId).classList.add('active');
-            
+
             // Close mobile menu
             document.getElementById('navMenu').classList.remove('active');
-            
+
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1706,10 +1722,10 @@
         async function sendChatMessage() {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
-            
+
             if (text) {
                 const messagesContainer = document.getElementById('chatMessages');
-                
+
                 // User message
                 messagesContainer.innerHTML += `<div class="message user">${text}</div>`;
                 input.value = '';
@@ -1750,7 +1766,7 @@
                             }
                         }
                     }
-                    
+
                     messagesContainer.innerHTML += `<div class="message bot">${botMessage}</div>`;
                 } catch (error) {
                     console.error('Error fetching from Ollama:', error);
@@ -1776,19 +1792,23 @@
             }
         });
 
-        // Auth Modal
-        function openAuthModal() {
+        // --- Auth ---
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+        function openAuthModal(formType = 'login') {
             document.getElementById('authModal').classList.add('active');
+            showAuthForm(formType);
         }
 
         function closeAuthModal() {
             document.getElementById('authModal').classList.remove('active');
         }
 
-        function toggleAuthForms() {
+        function showAuthForm(formType) {
             const loginContainer = document.getElementById('loginContainer');
             const signupContainer = document.getElementById('signupContainer');
-            if (loginContainer.style.display === 'none') {
+            if (formType === 'login') {
                 loginContainer.style.display = 'block';
                 signupContainer.style.display = 'none';
             } else {
@@ -1797,29 +1817,36 @@
             }
         }
 
-        // User Auth
         function handleSignup(event) {
             event.preventDefault();
             const form = event.target;
-            const user = {
-                name: form[0].value,
-                email: form[1].value,
-                password: form[2].value
-            };
-            localStorage.setItem('user', JSON.stringify(user));
+            const name = form.querySelector('input[type="text"]').value;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
+
+            if (users.find(u => u.email === email)) {
+                alert('An account with this email already exists.');
+                return;
+            }
+
+            const newUser = { id: Date.now(), name, email, password };
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
             alert('Sign up successful! Please sign in.');
-            toggleAuthForms();
+            showAuthForm('login');
         }
 
         function handleLogin(event) {
             event.preventDefault();
             const form = event.target;
-            const email = form[0].value;
-            const password = form[1].value;
+            const email = form.querySelector('input[type="email"]').value;
+            const password = form.querySelector('input[type="password"]').value;
 
-            const user = JSON.parse(localStorage.getItem('user'));
+            const user = users.find(u => u.email === email && u.password === password);
 
-            if (user && user.email === email && user.password === password) {
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 alert(`Welcome back, ${user.name}!`);
                 closeAuthModal();
                 updateNavForLoggedInUser(user);
@@ -1828,47 +1855,55 @@
             }
         }
 
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            updateNavForLoggedOutUser();
+            alert('You have been logged out.');
+        }
+
         function updateNavForLoggedInUser(user) {
             const navActions = document.getElementById('navActions');
             navActions.innerHTML = `
-                <button class="theme-toggle" onclick="toggleTheme()">
-                    <span id="themeIcon">🌙</span>
-                </button>
                 <span style="font-weight: 600;">Welcome, ${user.name}</span>
-                <button class="btn btn-primary" onclick="handleLogout()">Logout</button>
-                <div class="hamburger" onclick="toggleMenu()">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+                <button class="btn" onclick="handleLogout()">Logout</button>
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">${document.body.classList.contains('dark-mode') ? '☀️' : '🌙'}</span>
+                </button>
             `;
         }
 
-        function handleLogout() {
-            localStorage.removeItem('user');
-            location.reload();
+        function updateNavForLoggedOutUser() {
+            const navActions = document.getElementById('navActions');
+             navActions.innerHTML = `
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <span id="themeIcon">${document.body.classList.contains('dark-mode') ? '☀️' : '🌙'}</span>
+                </button>
+                <button class="btn btn-primary" onclick="openAuthModal('login')">Sign In / Sign Up</button>
+            `;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                updateNavForLoggedInUser(user);
+        function checkCurrentUser() {
+            if (currentUser) {
+                updateNavForLoggedInUser(currentUser);
+            } else {
+                updateNavForLoggedOutUser();
             }
-        });
+        }
     </script>
 
     <!-- Auth Modal -->
     <div class="auth-modal" id="authModal">
         <div class="auth-modal-content">
             <button class="close-auth-modal" onclick="closeAuthModal()">✕</button>
-            <div class="auth-form-container" id="loginContainer">
+            <div class="auth-form-container" id="loginContainer" style="display: none;">
                 <h2>Sign In</h2>
                 <form id="loginForm" onsubmit="handleLogin(event)">
                     <input type="email" placeholder="Email" required>
                     <input type="password" placeholder="Password" required>
                     <button type="submit" class="btn btn-primary">Sign In</button>
                 </form>
-                <p>Don't have an account? <a href="#" onclick="toggleAuthForms()">Sign Up</a></p>
+                <p>Don't have an account? <a href="#" onclick="showAuthForm('signup')">Sign Up</a></p>
             </div>
             <div class="auth-form-container" id="signupContainer" style="display: none;">
                 <h2>Create Account</h2>
@@ -1878,7 +1913,7 @@
                     <input type="password" placeholder="Password" required>
                     <button type="submit" class="btn btn-primary">Sign Up</button>
                 </form>
-                <p>Already have an account? <a href="#" onclick="toggleAuthForms()">Sign In</a></p>
+                <p>Already have an account? <a href="#" onclick="showAuthForm('login')">Sign In</a></p>
             </div>
         </div>
     </div>

@@ -261,6 +261,16 @@
                 const inactiveUsers = users.length - activeUsers;
 
                 mainContent.innerHTML = `
+                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
+                        <h2 class="text-3xl font-bold dark:text-gray-200">Manage Users</h2>
+                        <div class="relative">
+                            <button id="export-button" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Export</button>
+                            <div id="export-options" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-20">
+                                <a href="#" id="export-pdf" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Export as PDF</a>
+                                <a href="#" id="export-excel" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Export as Excel</a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                             <h3 class="text-xl font-semibold mb-4 dark:text-gray-200">User Status</h3>
@@ -320,6 +330,13 @@
                     }
                 });
                 activeCharts.push(userStatusChart);
+                
+                // Export functionality
+                const exportButton = document.getElementById('export-button');
+                const exportOptions = document.getElementById('export-options');
+                exportButton.addEventListener('click', () => exportOptions.classList.toggle('hidden'));
+                document.getElementById('export-pdf').addEventListener('click', (e) => { e.preventDefault(); exportToPDF(users); });
+                document.getElementById('export-excel').addEventListener('click', (e) => { e.preventDefault(); exportToExcel(users); });
             }
             
             /**
@@ -602,15 +619,10 @@
             const lightIcon = document.getElementById('theme-icon-light');
 
             const applyTheme = (theme) => {
-                if (theme === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    darkIcon.classList.remove('hidden');
-                    lightIcon.classList.add('hidden');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    darkIcon.classList.add('hidden');
-                    lightIcon.classList.remove('hidden');
-                }
+                const isDark = theme === 'dark';
+                document.documentElement.classList.toggle('dark', isDark);
+                darkIcon.classList.toggle('hidden', !isDark); // Show moon if dark
+                lightIcon.classList.toggle('hidden', isDark);  // Show sun if not dark
             };
 
             themeToggle.addEventListener('click', () => {

@@ -963,6 +963,25 @@
         </div>
     </div>
 
+    
+    <!-- Foods Section -->
+    <div id="foods" class="content-section">
+        <h2 class="section-title">Balinese Culinary Delights</h2>
+        <div class="destinations-grid" id="foodsGrid"></div>
+    </div>
+
+    <!-- Traditions Section -->
+    <div id="traditions" class="content-section">
+        <h2 class="section-title">Unique Balinese Traditions</h2>
+        <div class="destinations-grid" id="traditionsGrid"></div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer>
+        <p>Made with ❤️ in Bali</p>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary);">© 2025 BaliSphere. All rights reserved.</p>
+    </footer>
 
     <!-- Destination Popup -->
     <div class="destination-popup" id="destinationPopup">
@@ -990,25 +1009,6 @@
             </button>
         </div>
     </div>
-
-        <!-- Foods Section -->
-    <div id="foods" class="content-section">
-        <h2 class="section-title">Balinese Culinary Delights</h2>
-        <div class="destinations-grid" id="foodsGrid"></div>
-    </div>
-
-    <!-- Traditions Section -->
-    <div id="traditions" class="content-section">
-        <h2 class="section-title">Unique Balinese Traditions</h2>
-        <div class="destinations-grid" id="traditionsGrid"></div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <p>Made with ❤️ in Bali</p>
-        <p style="margin-top: 0.5rem; color: var(--text-secondary);">© 2025 BaliSphere. All rights reserved.</p>
-    </footer>
-
 
     <!-- Chatbot -->
     <button class="chatbot-button" onclick="toggleChatbot()">💬</button>
@@ -1133,7 +1133,7 @@
                 lat: -8.752,
                 lng: 115.474,
                 category: "Nature",
-                image: "https://bams.jambiprov.go.id/wp-content/uploads/2023/03/nusa-penida-1.png",
+                image: "https://nusapenida.org/wp-content/uploads/2023/09/Kelingking-Beach-Nusa-Penida-Bali-drone-panorama.jpg",
                 description: "A rugged island paradise famous for its dramatic cliffs, pristine beaches like Kelingking Beach, and incredible snorkeling spots.",
                 rating: 5,
                 activities: ["Snorkeling", "Diving", "Hiking", "Beach Hopping"],
@@ -1149,7 +1149,7 @@
                 lat: -8.519,
                 lng: 115.260,
                 category: "Nature",
-                image: "https://monkeyforestubud.com/wp-content/uploads/2023/09/banner-3-lowpress.jpg?x57725",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyXFeFPGyQpcoSq-wFapgP6EadURxwmAWu6A&s",
                 description: "A sacred sanctuary home to over a thousand long-tailed macaques. Wander through the lush jungle and discover ancient temples.",
                 rating: 4,
                 activities: ["Wildlife Watching", "Temple Visit", "Nature Walk", "Photography"],
@@ -1217,7 +1217,7 @@
         const baliFoods = [
             {
                 name: "Babi Guling",
-                image: "https://images.ctfassets.net/dsbipkqphva2/72JUsAlJ4IMn0Lsi7vpvEz/36de9180b101d808630599eadce4f40c/best-babi-guling-bali-lead.jpg",
+                image: "https://cdn.rri.co.id/berita/Singaraja/o/1758082470427-best-babi-guling-bali-lead/x6xd78z60b5hufb.jpeg",
                 description: "Suckling pig roasted over a fire with a blend of rich Balinese spices. A must-try celebratory dish.",
             },
             {
@@ -1227,7 +1227,7 @@
             },
             {
                 name: "Bebek Betutu",
-                image: "https://www.unileverfoodsolutions.co.id/dam/global-ufs/mcos/SEA/calcmenu/recipes/ID-recipes/chicken-&-other-poultry-dishes/bebek-betutu/main-header.jpg",
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyfhhyE4t0kFohVO993EzOEHBid_0WHYmvyw&s",
                 description: "Slow-cooked duck seasoned with a rich betutu spice mix, resulting in tender, flavorful meat.",
             }
         ];
@@ -1236,17 +1236,17 @@
         const baliTraditions = [
             {
                 name: "Nyepi (Day of Silence)",
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwZuVOXAw9ZVPGSVJSXT61HOCzym62sDL5UA&s",
+                image: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?w=800",
                 description: "A unique Hindu celebration where the entire island shuts down for 24 hours of silence, meditation, and self-reflection.",
             },
             {
                 name: "Galungan & Kuningan",
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRytTJJ6aNZ4jbjD0-AFk0mu7VRbvfo-O82Yg&s",
+                image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800",
                 description: "A major festival celebrating the victory of good over evil. Streets are decorated with beautiful bamboo poles called 'penjor'.",
             },
             {
                 name: "Kecak Dance",
-                image: "https://img.jakpost.net/c/2017/05/04/2017_05_04_26341_1493864360._large.jpg",
+                image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800",
                 description: "A captivating dance performance telling the Ramayana story, performed by a chorus of over a hundred men chanting 'cak-cak'.",
             }
         ];
@@ -1524,7 +1524,7 @@
                         </div>
                         <div class="hotel-footer">
                             <div class="hotel-price-tag">${hotel.price}/night</div>
-                            <button class="btn btn-primary">Book Now</button>
+                            <button class="btn btn-primary" onclick="openBookingModal('${hotel.name}')">Book Now</button>
                         </div>
                     </div>
                 </div>
@@ -1855,6 +1855,28 @@
                 updateNavForLoggedInUser(user);
             }
         });
+
+        // Booking Modal
+        function openBookingModal(hotelName) {
+            document.getElementById('bookingHotelName').textContent = hotelName;
+            document.getElementById('bookingModal').classList.add('active');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+        }
+
+        function handleBooking(event) {
+            event.preventDefault();
+            const form = event.target;
+            const hotelName = document.getElementById('bookingHotelName').textContent;
+            const name = form[0].value;
+            
+            alert(`Thank you, ${name}! Your booking for ${hotelName} has been confirmed. A confirmation email has been sent to you.`);
+            
+            form.reset();
+            closeBookingModal();
+        }
     </script>
 
     <!-- Auth Modal -->
@@ -1879,6 +1901,28 @@
                     <button type="submit" class="btn btn-primary">Sign Up</button>
                 </form>
                 <p>Already have an account? <a href="#" onclick="toggleAuthForms()">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="auth-modal" id="bookingModal">
+        <div class="auth-modal-content">
+            <button class="close-auth-modal" onclick="closeBookingModal()">✕</button>
+            <div class="auth-form-container">
+                <h2>Book Your Stay</h2>
+                <h3 id="bookingHotelName" style="margin-bottom: 1.5rem; color: var(--text-secondary);"></h3>
+                <form id="bookingForm" onsubmit="handleBooking(event)">
+                    <input type="text" placeholder="Full Name" required>
+                    <input type="email" placeholder="Email" required>
+                    <input type="tel" placeholder="Phone Number" required>
+                    <label for="checkin-date" style="text-align: left; margin-top: 1rem;">Check-in Date:</label>
+                    <input type="date" id="checkin-date" required>
+                    <label for="checkout-date" style="text-align: left; margin-top: 1rem;">Check-out Date:</label>
+                    <input type="date" id="checkout-date" required>
+                    <input type="number" placeholder="Number of Guests" min="1" required>
+                    <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                </form>
             </div>
         </div>
     </div>
